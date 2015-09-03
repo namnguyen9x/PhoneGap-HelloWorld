@@ -29,6 +29,22 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
         document.addEventListener('online', this.onOnline, false);
         document.addEventListener('offline', this.onOffline, false);
+
+        menuDiv = document.querySelector("#menu");
+        document.addEventListener("menubutton", doMenu, false);
+    },
+
+    doMenu: function () {
+        console.log("The menu was clicked...");
+        if(menuOpen) {
+            console.log("close the menu");
+            menuDiv.style.display="none";
+            menuOpen = false;
+        } else {
+            console.log("open the menu");
+            menuDiv.style.display="block";
+            menuOpen = true;
+        }
     },
 
     // deviceready Event Handler
