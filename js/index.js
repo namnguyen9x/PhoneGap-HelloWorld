@@ -35,16 +35,7 @@ var app = {
     },
 
     doMenu: function () {
-        console.log("The menu was clicked...");
-        if(menuOpen) {
-            console.log("close the menu");
-            menuDiv.style.display="none";
-            menuOpen = false;
-        } else {
-            console.log("open the menu");
-            menuDiv.style.display="block";
-            menuOpen = true;
-        }
+        alert('Menu button pressed.');
     },
 
     // deviceready Event Handler
