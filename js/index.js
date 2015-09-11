@@ -187,7 +187,7 @@
         if (localStorage.getItem("debug")!=""){
             localStorage.removeItem("debug");
         }
-        app.showAlert("Length after removed: " + localStorage.length, "Data stored", 0);
+        //app.showAlert("Length after removed: " + localStorage.length, "Data stored", 0);
         if (localStorage.length > 0){
             username = document.getElementById("username");
             password = document.getElementById("password");
