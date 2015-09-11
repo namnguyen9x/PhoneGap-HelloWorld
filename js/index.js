@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
+ * distributed with app work for additional information
+ * regarding copyright ownership.  The ASF licenses app file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
+ * "License"); you may not use app file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -16,53 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var app = {
+ var menuOpen = false;
+ var menuDiv = "";
+ var checkOnl = false;
+ var username = "";
+ var password = "";
+ var app = {
     // Application Constructor
     initialize: function() {
-        this.bindEvents();
+        app.bindEvents();
     },
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
-        document.addEventListener('online', this.onOnline, false);
-        document.addEventListener('offline', this.onOffline, false);
+        document.addEventListener('deviceready', app.onDeviceReady, false);
+        menuDiv = document.getElementById("options");
+        document.addEventListener("menubutton", app.doMenu, false);
 
-        menuDiv = document.querySelector("#menu");
-        document.addEventListener("menubutton", doMenu, false);
-    },
-
-    doMenu: function () {
-        alert('Menu button pressed.');
+        //document.addEventListener('touchstart', app.screenTouchStart, false);
+        //document.addEventListener('touchend', app.screenTouchEnd, false);
+        //document.addEventListener('online', app.onOnline, false);
+        document.addEventListener('offline', app.onOffline, false); 
     },
 
     // deviceready Event Handler
     //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
+    // The scope of 'app' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-        app.receivedEvent('deviceready');
+        // Check browser support
+        if (typeof(localStorage) == "undefined") {
+           app.showAlert("Sorry, your browser does not support Web Storage...", "Error", 0);
+        }
+        //app.receivedEvent('deviceready');
+        //app.showAlert("Ready", "Ready", 50);
     },
 
-    onOnline: function() {
-        var networkState = navigator.connection.type;
-        var states = {};
-        states[Connection.UNKNOWN]  = 'Unknown connection';
-        states[Connection.ETHERNET] = 'Ethernet connection';
-        states[Connection.WIFI]     = 'WiFi connection';
-        states[Connection.CELL_2G]  = 'Cell 2G connection';
-        states[Connection.CELL_3G]  = 'Cell 3G connection';
-        states[Connection.CELL_4G]  = 'Cell 4G connection';
-        states[Connection.CELL]     = 'Cell generic connection';
-        states[Connection.NONE]     = 'No network connection';
-        navigator.notification.alert(states[networkState], null, "Online", 'OK');
-    },
-
-    onOffline: function() {
-        navigator.notification.alert("Device is offline", null, "Offline", 'OK');
-    },
 
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -76,13 +67,106 @@ var app = {
         console.log('Received Event: ' + id);
     },
 
+    doMenu: function () {
+        if(menuOpen) {
+            menuDiv.style.display="none";
+            menuOpen = false;
+        } else {
+            menuDiv.style.display="block";
+            menuOpen = true;
+        }
+    },
+
+    screenTouchStart: function () {
+        alert("screenTouchStart");
+        if(menuOpen) {
+            menuDiv.style.display="none";
+            menuOpen = false;
+        }
+    },
+
+    screenTouchEnd: function () {
+        alert("screenTouchEnd");
+        if(menuOpen) {
+            menuDiv.style.display="none";
+            menuOpen = false;
+        }
+    },
+
+    //check online status
+    onOnline: function() {
+        var networkState = navigator.connection.type;
+        var states = {};
+        states[Connection.UNKNOWN]  = 'Unknown connection';
+        states[Connection.ETHERNET] = 'Ethernet connection';
+        states[Connection.WIFI]     = 'WiFi connection';
+        states[Connection.CELL_2G]  = 'Cell 2G connection';
+        states[Connection.CELL_3G]  = 'Cell 3G connection';
+        states[Connection.CELL_4G]  = 'Cell 4G connection';
+        states[Connection.CELL]     = 'Cell generic connection';
+        states[Connection.NONE]     = 'No network connection';
+        if (checkOnl == false) {
+            app.showAlert(states[networkState], null, "Online", 'OK');
+            checkOnl = true;
+        }
+    },
+
+    onOffline: function() {
+        app.showAlert("You are offline. Please turn on network for getting notification", "Offline", 'OK');
+    },
+
     //show alert
     showAlert: function (message, title, duration) {
         if (navigator.notification) {
             navigator.notification.alert(message, null, title, 'OK');
-            navigator.notification.vibrate(duration);
+            if (duration > 0){
+                navigator.notification.vibrate(duration);
+            }
         } else {
             alert(title ? (title + ": " + message) : message);
         }
     },
+
+    saveInfo: function (username, password) {
+        app.showAlert("Login information was saved", "Save", 0);
+        //alert(localStorage.length);
+        //if (localStorage.length > 0){
+            // for (var i = localStorage.length - 1; i >= 1; i--) {
+            //     var keyname = localStorage.key(i);
+            //     localStorage.removeItem(keyname);
+            // };
+            //localStorage.clear();
+        //}
+        localStorage.setItem(username, password);
+        //var keyname = localStorage.key(i);
+        //keyname is now equal to "key"
+        //var value = localStorage.getItem("key");
+        //value is now equal to "value"
+        //localStorage.removeItem("key");
+        //localStorage.setItem("key2", "value2");
+        //localStorage.clear();
+        //localStorage is now empty
+    },
+
+    getInfo: function () {
+        if (localStorage.getItem("debug")!=""){
+            localStorage.removeItem("debug");
+        }
+        //app.showAlert("Length after removed: " + localStorage.length, "Data stored", 0);
+        if (localStorage.length > 0){
+            username = document.getElementById("username");
+            password = document.getElementById("password");
+            var key = localStorage.key(localStorage.length - 1);
+            var value = localStorage.getItem(key);
+            if (value != ""){
+                username.value = key;
+                password.value = value;
+            }
+        }
+    },
+
+    clearData: function(){
+        localStorage.clear();
+        app.showAlert("All saved data was cleared", "Clear data", 0);
+    }
 };
