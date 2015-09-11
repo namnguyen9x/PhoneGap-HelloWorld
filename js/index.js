@@ -21,6 +21,7 @@
  var checkOnl = false;
  var username = "";
  var password = "";
+ var push = "";
  var app = {
     // Application Constructor
     initialize: function() {
@@ -32,12 +33,13 @@
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', app.onDeviceReady, false);
+        //push = PushNotification.init({ "android": {"senderID": "12345679"}, "ios": {"senderID": "12345679"}, "windows": {"senderID": "12345679"} } );
         menuDiv = document.getElementById("options");
         document.addEventListener("menubutton", app.doMenu, false);
 
         //document.addEventListener('touchstart', app.screenTouchStart, false);
         //document.addEventListener('touchend', app.screenTouchEnd, false);
-        //document.addEventListener('online', app.onOnline, false);
+        document.addEventListener('online', app.onOnline, false);
         document.addEventListener('offline', app.onOffline, false); 
     },
 
@@ -48,8 +50,8 @@
     onDeviceReady: function() {
         // Check browser support
         if (typeof(localStorage) == "undefined") {
-           app.showAlert("Sorry, your browser does not support Web Storage...", "Error", 0);
-        }
+         app.showAlert("Sorry, your browser does not support Web Storage...", "Error", 0);
+     }
         //app.receivedEvent('deviceready');
         //app.showAlert("Ready", "Ready", 50);
     },
@@ -105,14 +107,27 @@
         states[Connection.CELL_4G]  = 'Cell 4G connection';
         states[Connection.CELL]     = 'Cell generic connection';
         states[Connection.NONE]     = 'No network connection';
-        if (checkOnl == false) {
-            app.showAlert(states[networkState], null, "Online", 'OK');
-            checkOnl = true;
-        }
+        checkOnl = true;
     },
 
     onOffline: function() {
         app.showAlert("You are offline. Please turn on network for getting notification", "Offline", 'OK');
+        checkOnl = false;
+    },
+
+    checkConnection: function () {
+        var networkState = navigator.network.connection.type;
+        var states = {};
+        states[Connection.UNKNOWN]  = 'Unknown connection';
+        states[Connection.ETHERNET] = 'Ethernet connection';
+        states[Connection.WIFI]     = 'WiFi connection';
+        states[Connection.CELL_2G]  = 'Cell 2G connection';
+        states[Connection.CELL_3G]  = 'Cell 3G connection';
+        states[Connection.CELL_4G]  = 'Cell 4G connection';
+        states[Connection.NONE]     = 'No network connection';
+        if (networkState=="No network connection") {
+            app.showAlert("You are offline. Please turn on network for getting notification", "Offline", 'OK');
+        };
     },
 
     //show alert
@@ -128,8 +143,6 @@
     },
 
     saveInfo: function (username, password) {
-        app.showAlert("Login information was saved", "Save", 0);
-        //alert(localStorage.length);
         //if (localStorage.length > 0){
             // for (var i = localStorage.length - 1; i >= 1; i--) {
             //     var keyname = localStorage.key(i);
@@ -137,7 +150,29 @@
             // };
             //localStorage.clear();
         //}
-        localStorage.setItem(username, password);
+        // for (var i = localStorage.length - 1; i >= 0; i--) {
+        //     var key = localStorage.key(i);
+        //     if (localStorage.getItem(key)!=""){
+
+        //     }
+        // };
+
+        var found = false;
+        for ( var i = 0, len = localStorage.length; i < len; ++i ) {
+            alert(localStorage.key(i));
+            alert(username);
+            alert(localStorage.key(i) == username);
+            if (localStorage.key(i) == username){
+                localStorage.removeItem(username);
+                localStorage.setItem(username, password);
+                found = true;
+            }
+        }
+        
+        if (found=false){
+            localStorage.setItem(username, password);
+        }
+        app.showAlert("Login information was saved", "Save", 0);
         //var keyname = localStorage.key(i);
         //keyname is now equal to "key"
         //var value = localStorage.getItem("key");
@@ -152,7 +187,7 @@
         if (localStorage.getItem("debug")!=""){
             localStorage.removeItem("debug");
         }
-        //app.showAlert("Length after removed: " + localStorage.length, "Data stored", 0);
+        app.showAlert("Length after removed: " + localStorage.length, "Data stored", 0);
         if (localStorage.length > 0){
             username = document.getElementById("username");
             password = document.getElementById("password");
@@ -168,5 +203,16 @@
     clearData: function(){
         localStorage.clear();
         app.showAlert("All saved data was cleared", "Clear data", 0);
+    },
+
+    exitFromApp: function ()
+    {
+        if (navigator.app) {
+            navigator.app.exitApp();
+        }else {
+            if (navigator.device) {
+                navigator.device.exitApp();
+            }
+        }
     }
 };

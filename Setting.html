@@ -32,10 +32,11 @@
 <body onload="onLoad()">
 
     <div class="app">
-        <form id="idForm" onsubmit="onSubmit()">
+        <form id="form" onsubmit="return false">
           User name: <input type="text" id="username" style="width: 250px; height: 30px;"><br>
           Password: <input type="password" id="password" style="width: 250px; height: 30px;"><br>
-          <input type="submit" value="Save" style="width: 250px; height: 30px;">
+          <input type="button" value="Save" onclick="onSubmit()" style="width: 250px; height: 30px;">
+          <input type="button" value="Clear" onclick="clearFields()" style="width: 250px; height: 30px;">
         </form>
 
         <!-- <h1>PhoneGap</h1>
@@ -60,15 +61,19 @@
                 }else{
                     if(username==""){
                         app.showAlert("Username is empty", "Error", 0);
-                        return false;
                     }else{
                         if(password==""){
                             app.showAlert("Password is empty", "Error", 0);
-                            return false;
                         };
                     }; 
                 };
-                return false;
+            };
+
+            function clearFields(){
+                var username = document.getElementById("username");
+                var password = document.getElementById("password");
+                username.value = "";
+                password.value = "";
             };
 
             function onLoad(){
